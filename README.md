@@ -10,4 +10,4 @@
 
 `pip install -r requirements.txt`
 
-`python phpMyAdmin_Boom.py -u <url> -l <user>/<user file> -p <password file> -o <output>`
+`python phpMyAdmin_Boom.py -u <url> -l <user>/<user file> -p <password file>`
